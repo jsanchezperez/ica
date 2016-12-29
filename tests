@@ -1,0 +1,31 @@
+dir=~/windows/src/ipol_demo/app/inverse_compositional_algorithm/input
+
+par="-r 0 -t 8 "
+seq="affinity homography homography2 identity rotation rotation_translation translation zoom zoom_rotation zoom_rotation_translation"
+
+#test
+for i in $seq
+do
+  v=`sed '2q;d' $dir/$i.mat`
+  echo $i: $v
+  
+  /usr/bin/time -f "%E real,%U user,%S sys" color_method/inverse_compositional_algorithm $dir/${i}{1,2}.png $par 2>tmp
+  v=`sed '2q;d' transform.mat`
+  t=`cat tmp`
+  echo Color method: $v-- Time: $t
+  
+  /usr/bin/time -f "\t%E real,\t%U user,\t%S sys" gray_method/inverse_compositional_algorithm $dir/${i}{1,2}.png $par 2>tmp
+  v=`sed '2q;d' transform.mat`
+  t=`cat tmp`
+  echo Gray  method: $v-- Time: $t
+  
+  /usr/bin/time -f "\t%E real,\t%U user,\t%S sys" fast_method/inverse_compositional_algorithm $dir/${i}{1,2}.png $par 2>tmp
+  v=`sed '2q;d' transform.mat`
+  t=`cat tmp`
+  echo Fast method: $v-- Time: $t
+
+  /usr/bin/time -f "\t%E real,\t%U user,\t%S sys" fast_float_method/inverse_compositional_algorithm $dir/${i}{1,2}.png $par 2>tmp
+  v=`sed '2q;d' transform.mat`
+  t=`cat tmp`
+  echo Fast float method: $v-- Time: $t
+done
